@@ -3,10 +3,19 @@
   
     
     <entry>
+      <title>test1</title>
+      <link href="/2018/07/16/test1/"/>
+      <url>/2018/07/16/test1/</url>
+      <content type="html"><![CDATA[<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+    </entry>
+    
+    <entry>
       <title>这是我的第一篇博客</title>
       <link href="/2018/07/15/test/"/>
       <url>/2018/07/15/test/</url>
-      <content type="html"><![CDATA[<p>我来看看是不是真的有阅读全文了</p><p><img src="F:\blog\please\themes\next\source\images\0df8882dc58d75c6!480x480.png" alt=""></p><p>有图片嘛</p><p>老铁</p>]]></content>
+      <content type="html"><![CDATA[<p>我来看看是不是真的有图片<img src="/2018/07/15/test/blog\please\source\_posts\test1\0df8882dc58d75c6!480x480.png" alt="0df8882dc58d75c6!480x480"></p><p>老铁</p>]]></content>
       
       
     </entry>

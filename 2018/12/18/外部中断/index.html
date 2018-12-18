@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="熟悉外部中断相关实验">
+<meta name="keywords" content="ZigBee">
+<meta property="og:type" content="article">
+<meta property="og:title" content="外部中断">
+<meta property="og:url" content="http://yangpengze.github.io/2018/12/18/外部中断/index.html">
+<meta property="og:site_name" content="MyBlog">
+<meta property="og:description" content="熟悉外部中断相关实验">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://i.loli.net/2018/12/18/5c18fc17d1545.png">
+<meta property="og:updated_time" content="2018-12-18T13:56:38.619Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="外部中断">
+<meta name="twitter:description" content="熟悉外部中断相关实验">
+<meta name="twitter:image" content="https://i.loli.net/2018/12/18/5c18fc17d1545.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yangpengze.github.io/2018/12/18/外部中断/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>外部中断 | MyBlog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+
+<script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">MyBlog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yangpengze.github.io/2018/12/18/外部中断/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Little Young">
+      <meta itemprop="description" content="我曾踏足山巅 也曾陷入低谷">
+      <meta itemprop="image" content="/images/0df8882dc58d75c6!480x480.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MyBlog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">外部中断
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-18 21:50:36 / 修改时间：21:56:38" itemprop="dateCreated datePublished" datetime="2018-12-18T21:50:36+08:00">2018-12-18</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Zigbee基础部分/" itemprop="url" rel="index"><span itemprop="name">Zigbee基础部分</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">3.8k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">3 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>熟悉外部中断相关实验</p>
+<a id="more"></a>
+<h2 id="1、什么是外部中断"><a href="#1、什么是外部中断" class="headerlink" title="1、什么是外部中断"></a><strong>1、什么是外部中断</strong></h2><p>中断其实就是机器收到信号后，放下正在处理的任务，来处理你设定好的中断函数。CC2530按键外部中断，通过按键产生中断，进入中断函数，实现基本的中断控制。这种中断方式是基本的I/O中断。</p>
+<h2 id="2、通用I-O中断"><a href="#2、通用I-O中断" class="headerlink" title="2、通用I/O中断"></a><strong>2、通用I/O中断</strong></h2><p>CC2530的CPU有18个中断源，每个中断源都由一系列的SFR寄存器进行控制。每个中断都可以分别使能和控制（中断使能寄存器IEN0、IEN1、IEN2）（0:中断禁止1：中断使能）。通用I/O引脚在设置为输入后，可以用于产生中断。并且通用I/O中断还可以设置其触发方式。通用I/O中断在P0、P1、P2三个端口都可以产生，在设置其中断时需要将其要发生中断引脚的使能位置1。</p>
+<p>中断使能：让中断可以被触发，可以进入中断服务程序。</p>
+<p>中断禁止：即使中断信号来了也不会触发中断，也就不会进入中断服务程序。</p>
+<h2 id="3、中断优先级"><a href="#3、中断优先级" class="headerlink" title="3、中断优先级"></a><strong>3、中断优先级</strong></h2><p>为使系统能及时响应并处理发生的所有中断，系统根据引起中断事件的重要性和紧迫程度，硬件将中断源分为若干个级别，称作中断优先级。本次试验中，仅仅涉及到了通过按键产生中断信号，不需考虑优先级。</p>
+<h2 id="4、中断涉及到的寄存器"><a href="#4、中断涉及到的寄存器" class="headerlink" title="4、中断涉及到的寄存器"></a>4、<strong>中断涉及到的寄存器</strong></h2><h3 id="（1）中断使能寄存器"><a href="#（1）中断使能寄存器" class="headerlink" title="（1）中断使能寄存器"></a><strong>（1）中断使能寄存器</strong></h3><h4 id="1）IEN1（八位寄存器）"><a href="#1）IEN1（八位寄存器）" class="headerlink" title="1）IEN1（八位寄存器）"></a>1）IEN1（八位寄存器）</h4><p>中断使能寄存器IEN1控制P0端口、定时器1~4、和DMA中断的使能和禁止，如果使某一位中断使能，只需要将IEN1中对应的“位”设置为1即可；如果将中断禁止，只需要将其设置为0即可。比如，IEN1使能寄存器的第五位P0IE用来设置端口P0使能。</p>
+<p>例：IEN1中断设置</p>
+<p>/<em>设置P0端口中断使能</em>/</p>
+<p>IEN1|=0x20；</p>
+<h4 id="2）IEN2（八位寄存器）"><a href="#2）IEN2（八位寄存器）" class="headerlink" title="2）IEN2（八位寄存器）"></a><strong>2）IEN2（八位寄存器）</strong></h4><p>中断使能寄存器IEN2控制看门狗定时器、P1端口、串口发送、P2端口、RF中断的使能和禁止，如果使某一位中断使能，只需要将IEN2中对应的“位”设置为1即可；如果将中断禁止，只需要将其设置为0即可。比如，IEN2使能寄存器的第四位P1IE用来设置端口P1使能；第一位P2IE用来设置端口P2使能。</p>
+<p>例：IEN2使能设置</p>
+<p>/<em>设置P1和P2端口中断使能</em>/</p>
+<p>IEN2|=0x12；</p>
+<h4 id="3）PxIEN"><a href="#3）PxIEN" class="headerlink" title="3）PxIEN"></a><strong>3）PxIEN</strong></h4><p>IEN1和IEN2寄存器设置端口中断时，是将P0、P1和P2所有端口的引脚全部设置为中断使能。比如设置P0端口中断使能，实质上是设置了P0_0~P0_7所有的输入引脚中断使能，如果要单独设置某一引脚中断使能，除了设置IENx（x的取值为0和1）还需要设置PxIEN寄存器（x的取值为0、1、2）。PxIEN中断使能寄存器可以单独配置端口的某一引脚中断使能禁止。</p>
+<h4 id="4）P0IEN（八位寄存器）"><a href="#4）P0IEN（八位寄存器）" class="headerlink" title="4）P0IEN（八位寄存器）"></a>4）P0IEN（八位寄存器）</h4><p>中断使能寄存器P0IEN控制P0端口P0_0~P0_7引脚的中断禁止和使能，如果要使某一特定引脚中断使能或禁止，只需要在P0IEN中将相应的“位”设置为0或1即可。</p>
+<p>例：设置P0_5引脚中断使能</p>
+<p>/<em>设置P0_5中断使能</em>/</p>
+<p>P0IEN|=0x20；</p>
+<p>/<em>设置P0端口中断使能</em>/</p>
+<p>IEN|=0x20;</p>
+<h4 id="5）IEN0（八位寄存器）"><a href="#5）IEN0（八位寄存器）" class="headerlink" title="5）IEN0（八位寄存器）"></a><strong>5）IEN0（八位寄存器）</strong></h4><p>通用I/O中断在设置完引脚之后，需要开启CC2530总中断，总中断EA位于中断使能寄存器IEN0的第七位，此位决定CC2530所有中断的使能和禁止。通用I\O在设置完成引脚中断之后，需要将EA的总中断打开。</p>
+<p>例：EA设置</p>
+<p>/<em>打开总中断</em>/</p>
+<p>EA=1；</p>
+<h3 id="（2）中断触发方式寄存器"><a href="#（2）中断触发方式寄存器" class="headerlink" title="（2）中断触发方式寄存器"></a>（2）<strong>中断触发方式寄存器</strong></h3><p>通用I\O在作为中断使用时，可以配置其中断触发方式由寄存器PICTL来设置，其触发方式分为上升沿触发方式和下降沿触发方式。中断触发方式寄存器可以控制P0端口、P1端口和P2端口的触发方式，比如中断触发方式寄存器的第零位用来设置端口0的P0.0~</p>
+<p>P0.7输入模式下的中断配置，该位为所有端口0的输入P0.0~P0.7选择中断请求条件。0：输入的上升沿引起中断；1：输入的下降沿引起中断。</p>
+<p>例：PICTL中断设置</p>
+<p>/<em>设置P0_5下降沿触发中断</em>/</p>
+<p>PICTL|=0x01</p>
+<h3 id="（3）中断标志寄存器"><a href="#（3）中断标志寄存器" class="headerlink" title="（3）中断标志寄存器"></a><strong>（3）中断标志寄存器</strong></h3><h4 id="1）PxIFG"><a href="#1）PxIFG" class="headerlink" title="1）PxIFG"></a>1）PxIFG</h4><p>I/O中断发生后，中断标志寄存器的相应位会自动置1。在中断处理函数中判断是否有中断发生只需要判断寄存器PxIFG（其中x的取值为0、1、2）的值是否大于0，或者是PxIFG的某一位是否大于0即可。</p>
+<h4 id="2）P0IFG（八位寄存器）"><a href="#2）P0IFG（八位寄存器）" class="headerlink" title="2）P0IFG（八位寄存器）"></a>2）P0IFG（八位寄存器）</h4><p>如果在P0端口有中断发生，但不需要判断具体是哪一引脚发生中断是，在判断中断标志时只需要判断P0IFG是否大于0即可。</p>
+<p>例：中断标志判断</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">/*判断端口P0是否发生中断*/</span><br><span class="line"></span><br><span class="line">if（P0IFG&gt;0）</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果需要判断是否某一引脚发生中断，则需要判断PxIFG寄存器中相应的“位”是否置1.</p>
+<p>例：中断标志判断</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//判断P0_5是否发生中断</span><br><span class="line">If（P0IFG&amp;0x20&gt;0）</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="5、实验现象"><a href="#5、实验现象" class="headerlink" title="5、实验现象"></a>5、实验现象</h2><p>依次按下按键S1控制LED1的亮和灭</p>
+<h2 id="6、相关代码"><a href="#6、相关代码" class="headerlink" title="6、相关代码"></a>6、相关代码</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;ioCC2530.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> uint unsigned int</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> uchar unsigned char </span></span><br><span class="line"></span><br><span class="line"><span class="comment">//定义控制LED灯的端口</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> LED1 P1_0<span class="comment">//定义LED1为P1.0口控制</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> KEY1 P0_0<span class="comment">//中断口</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">//函数声明</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Delayms</span><span class="params">(uint)</span></span>;<span class="comment">//延时函数</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">KeyInit</span><span class="params">()</span></span>;<span class="comment">//按键初始化</span></span><br><span class="line"></span><br><span class="line">uchar KeyValue=<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//延时函数</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Delayms</span><span class="params">(uint xms)</span><span class="comment">//i=xms即延时i毫秒</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">	uint i,j;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(i=xms;i&gt;<span class="number">0</span>;i--)</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span>(j=<span class="number">587</span>;j&gt;<span class="number">0</span>;j--);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//LED初始化程序</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Config_IO</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">	P1DIR|=<span class="number">0x01</span>;<span class="comment">//P1_0定义为输出</span></span><br><span class="line"></span><br><span class="line">	P1INP|=<span class="number">0X01</span>;</span><br><span class="line"></span><br><span class="line">	LED1=<span class="number">0</span>;<span class="comment">//LED1灯熄灭</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//KEY初始化程序--外部中断方式</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Config_Key</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">	P0IEN|=<span class="number">0X01</span>;<span class="comment">//P00设置为中断方式</span></span><br><span class="line"></span><br><span class="line">	IEN1|=<span class="number">0X20</span>;<span class="comment">//允许P0口中断;</span></span><br><span class="line"></span><br><span class="line">	PICTL|=<span class="number">0x01</span>;<span class="comment">//下降沿触发</span></span><br><span class="line"></span><br><span class="line">	P0IFG=<span class="number">0x00</span>;<span class="comment">//初始化中断标志位</span></span><br><span class="line"></span><br><span class="line">	EA=<span class="number">1</span>;<span class="comment">//开CC2530总中断</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//中断处理函数</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//格式：#pragma vector = 中断向量，紧接着是中断处理程序</span></span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">pragma</span> vector = P0INT_VECTOR</span></span><br><span class="line"></span><br><span class="line">__<span class="function">interrupt <span class="keyword">void</span> <span class="title">P0_ISR</span><span class="params">(<span class="keyword">void</span>)</span> <span class="comment">//两个下划线</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">	Delay(<span class="number">10</span>);            <span class="comment">//去除抖动</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span>(KEY1==<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">	&#123;</span><br><span class="line"></span><br><span class="line">		LED1=~LED1;             <span class="comment">//改变LED1状态</span></span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	P0IFG = <span class="number">0</span>;             <span class="comment">//清中断标志 </span></span><br><span class="line"></span><br><span class="line">	P0IF = <span class="number">0</span>;             <span class="comment">//清中断标志 </span></span><br><span class="line"></span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line"><span class="comment">//主函数</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">	Config_IO();<span class="comment">//调用初始化函数</span></span><br><span class="line"></span><br><span class="line">	Config_Key();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span>(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="6、对代码的解释"><a href="#6、对代码的解释" class="headerlink" title="6、对代码的解释"></a>6、对代码的解释</h2><p>上述代码，主函数中只有三行语句，感觉好像没有用到中断函数，但其实是用到了的。所谓外部中断就是当接收到中断信号，就去处理中断即执行中断函数。一开始，程序运行到while（1）这个地方，在没有接收按键中断信号之前，它会一直停在那里。然后这时候按下按键S1后，表明中断信号已产生。然后程序就会停下当前的任务即一直进行while循环转去执行中断处理程序。然后执行完后回来继续while循环。</p>
+<p>还有对于该实验中的中断处理函数，需要注意的一点就是中断处理函数有很多种写法，有些地方可能会在一开始进行一个if语句的判断，来检测是否有中断产生，这里没有这样写。但是它一样能完成这样的一个中断处理。所以代码不需要去纠结，只要会用即可。还有这里的中断函数中有：</p>
+<p>P0IFG=0;//清中断标志</p>
+<p>P0IF=0;//清中断标志</p>
+<p>可能会有这样的一个想法：这两句是不是有些重复。其实不然，P0IF是清P0端口中断标志，而P0IFG是清P0端口具体某一位的中断标志。而且这两句少了其中任一句都不行（实验现象：当你按下按键后，灯会一直闪烁一直闪烁）。如果将这两句的位置调换一下也会影响实验现象（实验现象：一段时间，按下按键一次后，灯会亮一下然后保持灭的状态；一段时间，按下按键一次后，灯会灭一下然后保持亮的状态。）</p>
+<h2 id="重点"><a href="#重点" class="headerlink" title="重点"></a><strong>重点</strong></h2><p>学会根据手册来查看需要配置的寄存器</p>
+<p>下图为cc2530datashet-38文件的部分内容</p>
+<p>以P0_0口中断为例</p>
+<p><img src="https://i.loli.net/2018/12/18/5c18fc17d1545.png" alt="img"> </p>
+<p>由图可知 需要配置的是PICTL.P0ICON  P0IEN P0IE 以及EA </p>
+<p>中断标志位为 P0IFG P0IF</p>
+<p>之后去查手册 文件名为CC253X用户指南 搜索需要的寄存器</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ZigBee/" rel="tag"># ZigBee</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/18/按键实验/" rel="next" title="按键实验">
+                <i class="fa fa-chevron-left"></i> 按键实验
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/18/定时器/" rel="prev" title="定时器">
+                定时器 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODExMC8xNDY0MA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/0df8882dc58d75c6!480x480.png"
+                alt="Little Young" />
+            
+              <p class="site-author-name" itemprop="name">Little Young</p>
+              <p class="site-description motion-element" itemprop="description">我曾踏足山巅 也曾陷入低谷</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/Yangpengze" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:nam1351362922@qq.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、什么是外部中断"><span class="nav-number">1.</span> <span class="nav-text">1、什么是外部中断</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、通用I-O中断"><span class="nav-number">2.</span> <span class="nav-text">2、通用I/O中断</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3、中断优先级"><span class="nav-number">3.</span> <span class="nav-text">3、中断优先级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4、中断涉及到的寄存器"><span class="nav-number">4.</span> <span class="nav-text">4、中断涉及到的寄存器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#（1）中断使能寄存器"><span class="nav-number">4.1.</span> <span class="nav-text">（1）中断使能寄存器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1）IEN1（八位寄存器）"><span class="nav-number">4.1.1.</span> <span class="nav-text">1）IEN1（八位寄存器）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2）IEN2（八位寄存器）"><span class="nav-number">4.1.2.</span> <span class="nav-text">2）IEN2（八位寄存器）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3）PxIEN"><span class="nav-number">4.1.3.</span> <span class="nav-text">3）PxIEN</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4）P0IEN（八位寄存器）"><span class="nav-number">4.1.4.</span> <span class="nav-text">4）P0IEN（八位寄存器）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5）IEN0（八位寄存器）"><span class="nav-number">4.1.5.</span> <span class="nav-text">5）IEN0（八位寄存器）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（2）中断触发方式寄存器"><span class="nav-number">4.2.</span> <span class="nav-text">（2）中断触发方式寄存器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（3）中断标志寄存器"><span class="nav-number">4.3.</span> <span class="nav-text">（3）中断标志寄存器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1）PxIFG"><span class="nav-number">4.3.1.</span> <span class="nav-text">1）PxIFG</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2）P0IFG（八位寄存器）"><span class="nav-number">4.3.2.</span> <span class="nav-text">2）P0IFG（八位寄存器）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5、实验现象"><span class="nav-number">5.</span> <span class="nav-text">5、实验现象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6、相关代码"><span class="nav-number">6.</span> <span class="nav-text">6、相关代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6、对代码的解释"><span class="nav-number">7.</span> <span class="nav-text">6、对代码的解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重点"><span class="nav-number">8.</span> <span class="nav-text">重点</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Little Young</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+    <span title="站点总字数">37k</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+    <span title="站点阅读时长">33 分钟</span>
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Pisces</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.3.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <!-- 小红心 -->
+  <script type="text/javascript" src="/js/src/love.js"></script>
+</body>
+</html>

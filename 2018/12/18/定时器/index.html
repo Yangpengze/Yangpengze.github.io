@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.3.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.3.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.3.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.3.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.3.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="熟悉外部中断相关实验 利用定时器使LED周期性闪烁">
+<meta name="keywords" content="ZigBee">
+<meta property="og:type" content="article">
+<meta property="og:title" content="定时器">
+<meta property="og:url" content="http://yangpengze.github.io/2018/12/18/定时器/index.html">
+<meta property="og:site_name" content="MyBlog">
+<meta property="og:description" content="熟悉外部中断相关实验 利用定时器使LED周期性闪烁">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://i.loli.net/2018/12/18/5c18fe62e1710.png">
+<meta property="og:image" content="https://i.loli.net/2018/12/18/5c18fe895adab.png">
+<meta property="og:image" content="https://i.loli.net/2018/12/18/5c18fea16b202.png">
+<meta property="og:updated_time" content="2018-12-18T14:05:46.480Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="定时器">
+<meta name="twitter:description" content="熟悉外部中断相关实验 利用定时器使LED周期性闪烁">
+<meta name="twitter:image" content="https://i.loli.net/2018/12/18/5c18fe62e1710.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yangpengze.github.io/2018/12/18/定时器/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>定时器 | MyBlog</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+
+<script type="text/javascript" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">MyBlog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yangpengze.github.io/2018/12/18/定时器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Little Young">
+      <meta itemprop="description" content="我曾踏足山巅 也曾陷入低谷">
+      <meta itemprop="image" content="/images/0df8882dc58d75c6!480x480.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MyBlog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">定时器
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-18 21:57:37 / 修改时间：22:05:46" itemprop="dateCreated datePublished" datetime="2018-12-18T21:57:37+08:00">2018-12-18</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Zigbee基础部分/" itemprop="url" rel="index"><span itemprop="name">Zigbee基础部分</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">7.3k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">7 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>熟悉外部中断相关实验</p>
+<p>利用定时器使LED周期性闪烁</p>
+<a id="more"></a>
+<h2 id="1、通过定时器T1查询方式控制LED1周期性闪烁"><a href="#1、通过定时器T1查询方式控制LED1周期性闪烁" class="headerlink" title="1、通过定时器T1查询方式控制LED1周期性闪烁"></a><strong>1、通过定时器T1查询方式控制LED1周期性闪烁</strong></h2><h3 id="（1）定时器"><a href="#（1）定时器" class="headerlink" title="（1）定时器"></a>（1）定时器</h3><p>定时器就类似于计时器，可以顺计时，可以倒计时。</p>
+<p>我们可以事先给他设置一个值，确定它的工作时间t。在某一时刻让它开始工作，然后工作的时间达到t后，</p>
+<p>就产生一个行为或者更准确的说应该是一个中断请求，</p>
+<p>然后去处理这个中断，比如我们的LED灯就会亮。这么一来，它的功能就相当于一个延时函数，只不过延时函数是用程序来控制时间，而定时器是通过具体的硬件来实现对时间的控制。我认为定时器控制的时间应该更准确一些。</p>
+<p>CC2530有5个定时器，一个十六位（定时器1）、两个8位定时器（定时器3和定时器4）、一个用于休眠的定时器（睡眠定时器）和一个MAC定时器。本次试验只涉及到定时器1。</p>
+<h3 id="（2）通过定时器T1查询方式控制LED1周期性闪烁VS通过器时器T3中断方式控制LED1周期性闪烁"><a href="#（2）通过定时器T1查询方式控制LED1周期性闪烁VS通过器时器T3中断方式控制LED1周期性闪烁" class="headerlink" title="（2）通过定时器T1查询方式控制LED1周期性闪烁VS通过器时器T3中断方式控制LED1周期性闪烁"></a>（2）通过定时器T1查询方式控制LED1周期性闪烁VS通过器时器T3中断方式控制LED1周期性闪烁</h3><p>如果使用的中断的话定时时间一到马上执行中断函数；如果使用查询的话定时时间到了之后必须等到程序执行到判断语句的时候才能执行。所以实时性差。</p>
+<h3 id="（3）定时器T1的功能"><a href="#（3）定时器T1的功能" class="headerlink" title="（3）定时器T1的功能"></a>（3）定时器T1的功能</h3><p>定时器T1是一个独立的16位定时器，支持定时和计数功能，有输入捕获、输出比较和PWN的功能。定时器1有5个独立的输出捕获和输入比较通道。每个通道使用通道使用一个I/O引脚。</p>
+<p>定时器1的主要功能</p>
+<p>如下：</p>
+<h4 id="1）5个独立的捕获、比较通道。"><a href="#1）5个独立的捕获、比较通道。" class="headerlink" title="1）5个独立的捕获、比较通道。"></a>1）5个独立的捕获、比较通道。</h4><p>输入捕获的工作原理：</p>
+<p>当你设置的捕获开始的时候，cpu会将计数寄存器的值复制到捕获比较寄存器中并开始计数，当再次捕捉到电平变化时，这是计数寄存器中的值减去刚才复制的值就是这段电平的持续时间，你可以设置上升沿捕获、下降沿捕获、或者上升沿下降沿都捕获。它没多大用处，最常用来测频率。</p>
+<p>输出比较的工作原理：</p>
+<p>这里有两个单元：一个计数器单元和一个比较单元，比较单元就是个双缓冲寄存器，比较单元的值是可以根据不同的模式设置的，与此同时，计数器在不停的计数，并不停的与比较寄存器中的值进行比较，当计数器的值与比较寄存器的值相等的时候一个比较匹配就发生了，根据自己的设置，就会产生不同的波形了。</p>
+<h4 id="2）上升沿、下降沿或任何边沿的输入捕获。"><a href="#2）上升沿、下降沿或任何边沿的输入捕获。" class="headerlink" title="2）上升沿、下降沿或任何边沿的输入捕获。"></a>2）上升沿、下降沿或任何边沿的输入捕获。</h4><h4 id="3）设置、清除或切换输出比较。"><a href="#3）设置、清除或切换输出比较。" class="headerlink" title="3）设置、清除或切换输出比较。"></a>3）设置、清除或切换输出比较。</h4><h4 id="4）3种运行模式：自由运行、模计数模式和正-倒计数操作模式。"><a href="#4）3种运行模式：自由运行、模计数模式和正-倒计数操作模式。" class="headerlink" title="4）3种运行模式：自由运行、模计数模式和正/倒计数操作模式。"></a>4）3种运行模式：自由运行、模计数模式和正/倒计数操作模式。</h4><h4 id="5）可被1、8、32或128整除的时钟分频器。"><a href="#5）可被1、8、32或128整除的时钟分频器。" class="headerlink" title="5）可被1、8、32或128整除的时钟分频器。"></a>5）可被1、8、32或128整除的时钟分频器。</h4><h4 id="6）在捕获、比较和最终计数上生成中断请求。"><a href="#6）在捕获、比较和最终计数上生成中断请求。" class="headerlink" title="6）在捕获、比较和最终计数上生成中断请求。"></a>6）在捕获、比较和最终计数上生成中断请求。</h4><h4 id="7）具有DMA触发功能。"><a href="#7）具有DMA触发功能。" class="headerlink" title="7）具有DMA触发功能。"></a>7）具有DMA触发功能。</h4><h4 id="DMA触发可以通过设置DMA的触发源，来判断DMA通道会接收哪一个事件的触发。比如这里的定时器触发。"><a href="#DMA触发可以通过设置DMA的触发源，来判断DMA通道会接收哪一个事件的触发。比如这里的定时器触发。" class="headerlink" title="DMA触发可以通过设置DMA的触发源，来判断DMA通道会接收哪一个事件的触发。比如这里的定时器触发。"></a>DMA触发可以通过设置DMA的触发源，来判断DMA通道会接收哪一个事件的触发。比如这里的定时器触发。</h4><!--定时器1是CC2530中功能最全的一个定时/计数器，是在应用中被优先选用的对象。-->
+<h3 id="（4）定时器T1的运行模式"><a href="#（4）定时器T1的运行模式" class="headerlink" title="（4）定时器T1的运行模式"></a>（4）定时器T1的运行模式</h3><p> 定时器T1运行模式有多种，不同的运行模式有不同的功能。本次试验只涉及到自由运行模式。自由运行模式下，计数器从0x0000开始，每个活动时钟边沿增加1。当计数器达到0xFFFF会产生自动溢出，然后计数器自动载入0x0000，继续递增计数，当达到最终数值0xFFFF产生溢出。当产生溢出之后，相应的寄存器会自动产生溢出标志。</p>
+<p>Ps：定时器1具有一个十六位的计数器，计数器具备运行模式。</p>
+<h3 id="（5）所涉及到的寄存器"><a href="#（5）所涉及到的寄存器" class="headerlink" title="（5）所涉及到的寄存器"></a>（5）所涉及到的寄存器</h3><h4 id="1）T1CTL（控制寄存器）"><a href="#1）T1CTL（控制寄存器）" class="headerlink" title="1）T1CTL（控制寄存器）"></a>1）T1CTL（控制寄存器）</h4><p>定时器T1的控制寄存器T1CTL是一个八位寄存器。它的主要功能时选择定时器T1的工作模式和分频器频率划分。</p>
+<p>它的第0位和第1位是用来设置定时器T1的模式。定时器操作模式通过下列方式设置：</p>
+<p> 00：暂停运行。</p>
+<p> 01：自由运行，从0x0000到0xFFF反复计数。</p>
+<p> 10：模计数，从0x0000到TICCO反复计数。</p>
+<p> 11：正计数/倒计数，从0x0000到T1CC0反复计数且从T1CC0倒计数到0x0000。</p>
+<p>它的第2位和第3位用来设置分频器划分值。产生主动的时钟边缘用来更新计数器，如下：</p>
+<p>00：标记频率/1</p>
+<p>01：标记频率/8</p>
+<p>10：标记频率/32</p>
+<p>11：标记频率/128</p>
+<p>它的第4位到第7位保留。</p>
+<h4 id="2）T1STAT（状态寄存器）"><a href="#2）T1STAT（状态寄存器）" class="headerlink" title="2）T1STAT（状态寄存器）"></a>2）T1STAT（状态寄存器）</h4><p>定时器1的状态寄存器T1STAT是一个八位寄存器。只负责定时器1中断标志，包括定时器溢出中断标志和定时器1通道0~4的中断标志。</p>
+<p>它的第0位到第4位为通道0~通道4的中断标志，第5位为溢出标志位，当计数器达到计数终值自动置1。</p>
+<p>D0：定时器1通道0中断标志位</p>
+<p>D1：定时器1通道1中断标志位</p>
+<p>D2：定时器1通道2中断标志位</p>
+<p>D3：定时器1通道3中断标志位</p>
+<p>D4：定时器1通道4中断标志位</p>
+<p>D5：定时器溢出中断标志位</p>
+<p>D7：未用</p>
+<p>D8:未用</p>
+<h4 id="3）IRCON（中断标志位寄存器）"><a href="#3）IRCON（中断标志位寄存器）" class="headerlink" title="3）IRCON（中断标志位寄存器）"></a>3）IRCON（中断标志位寄存器）</h4><p>当定时器1中断发生时设为1并且当CPU向量指向中断服务例程时清除。</p>
+<p>0：无中断请求</p>
+<p>1：有中断请求</p>
+<h3 id="（6）实验源代码"><a href="#（6）实验源代码" class="headerlink" title="（6）实验源代码"></a>（6）实验源代码</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;ioCC2530.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> uint unsigned int</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> uchar unsigned char</span></span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="comment">//定义控制LED灯的端口</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> LED1 P1_0<span class="comment">//定义LED1为P10口控制</span></span></span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="comment">//函数声明</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Delay</span><span class="params">(uint xms)</span></span>;<span class="comment">//延时函数</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Config_GPIO</span><span class="params">(<span class="keyword">void</span>)</span></span>;<span class="comment">//初始化P1口</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Config_T1</span><span class="params">()</span></span>;                <span class="comment">//初始化定时器T1</span></span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="comment">//延时函数</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Delay</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">int</span> k)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">unsigned</span> <span class="keyword">int</span> i = k; i &gt; <span class="number">0</span>; i --)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">unsigned</span> <span class="keyword">int</span> j = <span class="number">587</span>; j &gt;<span class="number">0</span>; j --);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//初始化程序</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Config_GPIO</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">  P1DIR |= <span class="number">0x03</span>;     <span class="comment">//P1_0定义为输出</span></span><br><span class="line"></span><br><span class="line">  P1INP |= <span class="number">0X01</span>;     <span class="comment">//打开下拉三态输出</span></span><br><span class="line"></span><br><span class="line">  </span><br><span class="line"></span><br><span class="line">  LED1=<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  LED2=<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//定时器初始化</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Config_T1</span><span class="params">()</span> <span class="comment">//系统不配置工作时钟时默认是2分频，即16MHz</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">  T1CTL = <span class="number">0x0d</span>;          <span class="comment">//128分频，自动重装 0X0000-0XFFFF </span></span><br><span class="line"></span><br><span class="line">  T1STAT= <span class="number">0x21</span>;          <span class="comment">//通道0, 中断有效   </span></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="comment">//主函数</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">  uchar count;</span><br><span class="line"></span><br><span class="line">  Config_GPIO();</span><br><span class="line"></span><br><span class="line">  Config_T1();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">  &#123;</span><br><span class="line">   <span class="keyword">if</span>(IRCON&gt;<span class="number">0</span>)</span><br><span class="line">   &#123; </span><br><span class="line">      IRCON=<span class="number">0</span>;</span><br><span class="line">      <span class="keyword">if</span>(count++=<span class="number">1</span>)      <span class="comment">//约2s周期性闪烁</span></span><br><span class="line">      &#123;</span><br><span class="line">       count=<span class="number">0</span>;</span><br><span class="line">       LED1 = !LED1;        <span class="comment">//LED1闪烁        </span></span><br><span class="line">      &#125;</span><br><span class="line">   &#125; </span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="（7）对代码的解释"><a href="#（7）对代码的解释" class="headerlink" title="（7）对代码的解释"></a>（7）对代码的解释</h3><p>  首先是一些命令行，然后就是一函数的声明。这里有三个函数，分别是延时函数、灯初始化函数和定时器初始化函数。前面两个函数都不是重点，关键是定时器初始化函数。我们只是将将灯作为我们实验的一个现象展示，让我们对定时器有一个深入的了解，以后它将作为一个模块应用到其他的场景中，比如通过定时器来控制某一个物体的开关。这里的定时器初始化函数中只有两行代码。T1CTL = 0x0d; 它表示我们这个定时器的工作模式是自由运行模式，工作频率为128分频，至于它的值是怎么来的呢？我们前面讲过，T1CTL控制寄存器它是一个八位寄存器，它的第0位和第1位是控制定时器的工作模式的，当为01表示的是自由运行模式，我们本次试验涉及的就是自由运行模式，所以低两位为01，而它的第3位和第4位是控制定时器分频的，当为11时表示的是128分频，所以T1CTL的低四位是1101，高四位保留即为0000，所以转化为十六进制为0x0d。<!--T1STAT=0x21；它表示的是通道0中断有效。试验证明其实这一个设置要不要都不影响。-->紧接着就是主函数，其实我们应该是从主函数开始讲解。首先定义一个无符号的字符类型变量count，它作为整数使用的话范围是从0到255，默认值是0。该变量在计算总时间的一个公式中会用到。然后就是初始化函数，完了后进入到一个无限循环，while循环中首先用if语句判断一下是否有中断请求，有的话表明寄存器IRCON的值为1，此时将它置为0。</p>
+<p>然后执行下一个if语句，判断count的值，count的值应该是记录计时器达到0xFFFF的次数。然后count究竟能处在一个什么样的范围内，就取决于你想让他间隔多长时间闪烁一次。这里是count的值等于1。if条件成立，执行下一步将count置零，紧接着改变灯的转态。第二个if语句也可以用一个延时函数来代替。</p>
+<p>对于main函数的解析</p>
+<p>计数器计满一次 </p>
+<p>Ps：系统在不配置工作频率时默认为 2 分频，即32M/2=16M，所以定时器每次溢出时T=1/(16M/128)<em>65536≈0.5s, 所以总时间Ta=T</em>count=0.5*1=0.5S切换 1 次状态。所以看起来是 1S 闪烁 1 次。注意 闪烁的意思是亮-灭。</p>
+<h2 id="2、利用定时器T3中断方式控制LED1状态周期性改变"><a href="#2、利用定时器T3中断方式控制LED1状态周期性改变" class="headerlink" title="2、利用定时器T3中断方式控制LED1状态周期性改变"></a><strong>2、利用定时器T3中断方式控制LED1状态周期性改变</strong></h2><h3 id="（1）定时器T3的介绍"><a href="#（1）定时器T3的介绍" class="headerlink" title="（1）定时器T3的介绍"></a>（1）定时器T3的介绍</h3><h4 id="1）定时器3的运行模式"><a href="#1）定时器3的运行模式" class="headerlink" title="1）定时器3的运行模式"></a>1）定时器3的运行模式</h4><p>定时器3是一个八位寄存器，它有两个独立独立的比较/捕获通道，每个通道上使用一个I/O引脚。它还具有一个8位的计数器，提供定时和计数功能。计数器有4种运行模式：自由运行模式、倒计数模式、模计数模式和正/倒计数模式。本次试验用到的是自由运行模式，定时器的计数器从0x00开始，在每个时钟活动的边沿递增，当计数器达到0xFF，计数器将重装载入0x00。如果设置了中断，当达到最终计数值0xFF时，将产生一个中断请求。</p>
+<h4 id="2）定时器通道"><a href="#2）定时器通道" class="headerlink" title="2）定时器通道"></a>2）定时器通道</h4><p>定时器3有两个通道，通道0和通道1，每个通道的模式是由控制和状态寄存器来控制的，设置模式包括捕获模式和输出比较模式。当通道配置为输入捕获模式时，通道相关的I/O引脚配置为一个输入。定时器启动之后，输入引脚上的一个上升沿、下降沿或任何边沿都会触发一个捕获，即捕获8位计数器内容到相关的通道捕获寄存器中，因此定时器能够捕获一个外部事件发生的时间。它的每一次捕获可以作为一个触发中断事件。当通道配置为输出比较模式，通道相关的I/O引脚必须设置为输出。定时器启动之后，将对比计数器的内容和通道比较寄存器的内容。</p>
+<h4 id="3）定时器中断"><a href="#3）定时器中断" class="headerlink" title="3）定时器中断"></a>3）定时器中断</h4><p>定时器3有一个中断向量，当触发中断事件发生时，将产生一个中断请求，有下列几种触发中断事件：</p>
+<p>计数器达到最终计数值；</p>
+<p>比较事件；</p>
+<p>捕获事件。</p>
+<p>Ps：所有涉及到中断的实验应当都是首先有一个触发中断事件，然后由中断向量产生一个中断请求，紧接着转去处理中断。</p>
+<h3 id="（2）相关寄存器的配置"><a href="#（2）相关寄存器的配置" class="headerlink" title="（2）相关寄存器的配置"></a>（2）相关寄存器的配置</h3><h4 id="1）控制寄存器T3CTL（八位寄存器）"><a href="#1）控制寄存器T3CTL（八位寄存器）" class="headerlink" title="1）控制寄存器T3CTL（八位寄存器）"></a>1）控制寄存器T3CTL（八位寄存器）</h4><p>定时器3控制寄存器T3CTL主要负责定时器的分频器的划分、定时器的停止/运行、定时器的中断设置、定时器的计数器清除、定时器的功能模式选择。</p>
+<p>从高位到地位：</p>
+<p>7~5：负责分频器划分值。</p>
+<p>000：标记频率/1</p>
+<p>001：标记频率/2</p>
+<p>010：标记频率/4</p>
+<p>011：标记频率/8</p>
+<p>100：标记频率/16</p>
+<p>101：标记频率/32</p>
+<p>110：标记频率/64</p>
+<p>111：标记频率/128</p>
+<p>4:负责启动定时器。</p>
+<p>3：负责溢出中断屏蔽。</p>
+<p>0：中断禁止</p>
+<p>1：中断使能</p>
+<p>2：负责清除计数器。</p>
+<p>0~1：负责选择定时器的模式。</p>
+<p>00：自由运行模式</p>
+<p>01：倒计数模式</p>
+<p>10：模计数模式</p>
+<p>11：正计数/倒计数模式</p>
+<h3 id="3-相关代码"><a href="#3-相关代码" class="headerlink" title="(3)相关代码"></a>(3)相关代码</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;ioCC2530.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> uint unsigned int</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> uchar unsigned char</span></span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="comment">//定义控制LED灯的端口</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> LED1 P1_0  <span class="comment">//定义LED1为P10口控制</span></span></span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">uint count;<span class="comment">//用于定时器计数</span></span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="comment">//延时函数</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Delay</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">int</span> k)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">unsigned</span> <span class="keyword">int</span> i = k; i &gt; <span class="number">0</span>; i --)</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">unsigned</span> <span class="keyword">int</span> j = <span class="number">587</span>; j &gt;<span class="number">0</span>; j --);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line"><span class="comment">//初始化程序</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Config_GPIO</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">  P1DIR |= <span class="number">0x03</span>;     <span class="comment">//P1_0定义为输出</span></span><br><span class="line"></span><br><span class="line">  P1INP |= <span class="number">0X01</span>;     <span class="comment">//打开下拉三态输出</span></span><br><span class="line"></span><br><span class="line">  </span><br><span class="line"></span><br><span class="line">  LED1=<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  LED2=<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//定时器初始化</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Config_T3</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;     </span><br><span class="line"></span><br><span class="line">  T3CTL |= <span class="number">0x08</span> ;            <span class="comment">//开溢出中断     </span></span><br><span class="line"></span><br><span class="line">  T3IE = <span class="number">1</span>;                  <span class="comment">//开总中断和T3中断</span></span><br><span class="line"></span><br><span class="line">  T3CTL|=<span class="number">0XE0</span>;               <span class="comment">//128分频,128/16000000*N=0.5S,N=65200</span></span><br><span class="line"></span><br><span class="line">  T3CTL &amp;= ~<span class="number">0X03</span>;            <span class="comment">//自动重装 00－&gt;0xff  65200/256=254(次)</span></span><br><span class="line"></span><br><span class="line">  T3CTL |=<span class="number">0X10</span>;              <span class="comment">//启动</span></span><br><span class="line"></span><br><span class="line">  EA = <span class="number">1</span>; </span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//主函数</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;	</span><br><span class="line"></span><br><span class="line">  Config_GPIO();		<span class="comment">//调用初始化函数</span></span><br><span class="line"></span><br><span class="line">  Config_T3();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span>(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">\<span class="meta">#<span class="meta-keyword">pragma</span> vector = T3_VECTOR <span class="comment">//定时器T3</span></span></span><br><span class="line"></span><br><span class="line"> __<span class="function">interrupt <span class="keyword">void</span> <span class="title">T3_ISR</span><span class="params">(<span class="keyword">void</span>)</span> </span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"> </span>&#123; </span><br><span class="line">    IRCON = <span class="number">0x00</span>;                  <span class="comment">//清中断标志, 也可由硬件自动完成 </span></span><br><span class="line">    <span class="keyword">if</span>(++count&gt;<span class="number">254</span>)                <span class="comment">//254次中断后LED取反，闪烁一轮（约为0.5s) </span></span><br><span class="line">    &#123;          </span><br><span class="line">      count = <span class="number">0</span>;                    <span class="comment">// 计数清零 </span></span><br><span class="line">      LED1=~LED1;</span><br><span class="line">    &#125; </span><br><span class="line"></span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="重点"><a href="#重点" class="headerlink" title="重点"></a><strong>重点</strong></h2><h3 id="CC2530定时-计数器的工作模式"><a href="#CC2530定时-计数器的工作模式" class="headerlink" title="CC2530定时/计数器的工作模式"></a><strong>CC2530定时/计数器的工作模式</strong></h3><p>（1）自由运行模式 </p>
+<p><img src="https://i.loli.net/2018/12/18/5c18fe62e1710.png" alt="img"> </p>
+<p>在自由运行模式下，计数器从0x0000开始，在每个活动时钟边沿增加1，当计数器达到0xFFFF时溢出，计数器重新载入0x0000并开始新一轮递增计数 </p>
+<p>自由运行模式最大为FFFF也就是65535</p>
+<p>自由运行模式的计数周期是固定值0xFFFF，当计数器达到最终计数值0xFFFF时，</p>
+<p>系统自动设置标志位IRCON.T1IF和T1STAT.OVFIF，—— 用于查询</p>
+<p>如果用户设置了相应的中断屏蔽位TIMIF.T1OVFIM和IEN1.T1EN，——用于中断请求。</p>
+<p>（2）模模式</p>
+<p><img src="https://i.loli.net/2018/12/18/5c18fe895adab.png" alt="img"><br>    在模模式下，计数器从0x0000开始，在每个活动时钟边沿增加1，当计数器达到T1CC0寄存器保存的值时溢出，计数器将复位到0x0000并开始新一轮递增计数。</p>
+<p>计数溢出后，将置位相应标志位，同时如果设置了相应的中断使能则会产生一个中断请求。T1CC0由2个8位寄存器T1CC0H和T1CC0L构成，分别用来保存最终计数值的高8位和低8位。模模式的计数周期不是固定值，可由用户自行设定，以便获取不同时长的定时时间。 </p>
+<p>定时器3和定时器4的倒计数模式类似与模模式，只不过计数值是从最大计数值向0x00倒序计数。</p>
+<p>（3）正计数/倒计数模式</p>
+<p><img src="https://i.loli.net/2018/12/18/5c18fea16b202.png" alt="img"><br>    在正计数/倒计数模式下，计数器反复从0x0000开始，正计数到T1CC0保存的最终计数值，然后再倒计时回0x0000。</p>
+<p>正计数/倒计数模式下，计数器在到达最终计数值时溢出，并置位相关标志位，若用户已使能相关中断，则会产生中断请求。这种工作模式在用来进行PWM控制时可以实现中心对齐的PWM输出。</p>
+<h3 id="单片机中的定时-计数器一般具有以下功能："><a href="#单片机中的定时-计数器一般具有以下功能：" class="headerlink" title="单片机中的定时/计数器一般具有以下功能："></a><strong>单片机中的定时/计数器一般具有以下功能：</strong></h3><h4 id="1）定时器功能"><a href="#1）定时器功能" class="headerlink" title="1）定时器功能"></a>1）定时器功能</h4><p>对规定时间间隔的输入信号的个数进行计数，当计数值达到指定值时，说明定时时间已到。这是定时/计数器的常用功能，可用来实现延时或定时控制，其输入信号一般使用单片机内部的时钟信号。 </p>
+<h4 id="2）计数器功能"><a href="#2）计数器功能" class="headerlink" title="2）计数器功能"></a>2）计数器功能</h4><p>对任意时间间隔的输入信号的个数进行计数。一般用来对外界事件进行计数，其输入信号一般来自单片机外部开关型传感器，可用于生产线产品计数、信号数量统计和转速测量等方面。 </p>
+<h4 id="3）捕获功能"><a href="#3）捕获功能" class="headerlink" title="3）捕获功能"></a>3）捕获功能</h4><p>对规定时间间隔的输入信号的个数进行计数，当外界输入有效信号时，捕获计数器的计数值。通常用来测量外界输入脉冲的脉宽或频率，需要在外界输入信号的上升沿和下降沿进行两次捕获，通过计算两次捕获值的差值可以计算出脉宽或周期等信息。 </p>
+<h4 id="4）比较功能"><a href="#4）比较功能" class="headerlink" title="4）比较功能"></a>4）比较功能</h4><p>当计数值与需要进行比较的值相同时向CPU提出中断请求或改变I/O口输出电平等操作。一般用于控制信号输出。 </p>
+<h4 id="5）PWM输出功能"><a href="#5）PWM输出功能" class="headerlink" title="5）PWM输出功能"></a>5）PWM输出功能</h4><p>对规定时间间隔的输入信号的个数进行计数，根据设定的周期和占空比从I/O口输出控制信号。一般用来控制LED灯亮度或电机转速。</p>
+<h3 id="工作流程"><a href="#工作流程" class="headerlink" title="工作流程"></a><strong>工作流程</strong></h3><p>【1】 设置定时器的分频系数，工作模式</p>
+<p>【2】 [设置定时器1最大计数值]</p>
+<p>【3】 使能定时器1相关中断</p>
+<p>【4】 EA</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ZigBee/" rel="tag"># ZigBee</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/12/18/外部中断/" rel="next" title="外部中断">
+                <i class="fa fa-chevron-left"></i> 外部中断
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zODExMC8xNDY0MA=="></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/0df8882dc58d75c6!480x480.png"
+                alt="Little Young" />
+            
+              <p class="site-author-name" itemprop="name">Little Young</p>
+              <p class="site-description motion-element" itemprop="description">我曾踏足山巅 也曾陷入低谷</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/Yangpengze" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:nam1351362922@qq.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、通过定时器T1查询方式控制LED1周期性闪烁"><span class="nav-number">1.</span> <span class="nav-text">1、通过定时器T1查询方式控制LED1周期性闪烁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#（1）定时器"><span class="nav-number">1.1.</span> <span class="nav-text">（1）定时器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（2）通过定时器T1查询方式控制LED1周期性闪烁VS通过器时器T3中断方式控制LED1周期性闪烁"><span class="nav-number">1.2.</span> <span class="nav-text">（2）通过定时器T1查询方式控制LED1周期性闪烁VS通过器时器T3中断方式控制LED1周期性闪烁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（3）定时器T1的功能"><span class="nav-number">1.3.</span> <span class="nav-text">（3）定时器T1的功能</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1）5个独立的捕获、比较通道。"><span class="nav-number">1.3.1.</span> <span class="nav-text">1）5个独立的捕获、比较通道。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2）上升沿、下降沿或任何边沿的输入捕获。"><span class="nav-number">1.3.2.</span> <span class="nav-text">2）上升沿、下降沿或任何边沿的输入捕获。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3）设置、清除或切换输出比较。"><span class="nav-number">1.3.3.</span> <span class="nav-text">3）设置、清除或切换输出比较。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4）3种运行模式：自由运行、模计数模式和正-倒计数操作模式。"><span class="nav-number">1.3.4.</span> <span class="nav-text">4）3种运行模式：自由运行、模计数模式和正/倒计数操作模式。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5）可被1、8、32或128整除的时钟分频器。"><span class="nav-number">1.3.5.</span> <span class="nav-text">5）可被1、8、32或128整除的时钟分频器。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6）在捕获、比较和最终计数上生成中断请求。"><span class="nav-number">1.3.6.</span> <span class="nav-text">6）在捕获、比较和最终计数上生成中断请求。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7）具有DMA触发功能。"><span class="nav-number">1.3.7.</span> <span class="nav-text">7）具有DMA触发功能。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DMA触发可以通过设置DMA的触发源，来判断DMA通道会接收哪一个事件的触发。比如这里的定时器触发。"><span class="nav-number">1.3.8.</span> <span class="nav-text">DMA触发可以通过设置DMA的触发源，来判断DMA通道会接收哪一个事件的触发。比如这里的定时器触发。</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（4）定时器T1的运行模式"><span class="nav-number">1.4.</span> <span class="nav-text">（4）定时器T1的运行模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（5）所涉及到的寄存器"><span class="nav-number">1.5.</span> <span class="nav-text">（5）所涉及到的寄存器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1）T1CTL（控制寄存器）"><span class="nav-number">1.5.1.</span> <span class="nav-text">1）T1CTL（控制寄存器）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2）T1STAT（状态寄存器）"><span class="nav-number">1.5.2.</span> <span class="nav-text">2）T1STAT（状态寄存器）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3）IRCON（中断标志位寄存器）"><span class="nav-number">1.5.3.</span> <span class="nav-text">3）IRCON（中断标志位寄存器）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（6）实验源代码"><span class="nav-number">1.6.</span> <span class="nav-text">（6）实验源代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（7）对代码的解释"><span class="nav-number">1.7.</span> <span class="nav-text">（7）对代码的解释</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、利用定时器T3中断方式控制LED1状态周期性改变"><span class="nav-number">2.</span> <span class="nav-text">2、利用定时器T3中断方式控制LED1状态周期性改变</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#（1）定时器T3的介绍"><span class="nav-number">2.1.</span> <span class="nav-text">（1）定时器T3的介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1）定时器3的运行模式"><span class="nav-number">2.1.1.</span> <span class="nav-text">1）定时器3的运行模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2）定时器通道"><span class="nav-number">2.1.2.</span> <span class="nav-text">2）定时器通道</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3）定时器中断"><span class="nav-number">2.1.3.</span> <span class="nav-text">3）定时器中断</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（2）相关寄存器的配置"><span class="nav-number">2.2.</span> <span class="nav-text">（2）相关寄存器的配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1）控制寄存器T3CTL（八位寄存器）"><span class="nav-number">2.2.1.</span> <span class="nav-text">1）控制寄存器T3CTL（八位寄存器）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-相关代码"><span class="nav-number">2.3.</span> <span class="nav-text">(3)相关代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重点"><span class="nav-number">3.</span> <span class="nav-text">重点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CC2530定时-计数器的工作模式"><span class="nav-number">3.1.</span> <span class="nav-text">CC2530定时/计数器的工作模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#单片机中的定时-计数器一般具有以下功能："><span class="nav-number">3.2.</span> <span class="nav-text">单片机中的定时/计数器一般具有以下功能：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1）定时器功能"><span class="nav-number">3.2.1.</span> <span class="nav-text">1）定时器功能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2）计数器功能"><span class="nav-number">3.2.2.</span> <span class="nav-text">2）计数器功能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3）捕获功能"><span class="nav-number">3.2.3.</span> <span class="nav-text">3）捕获功能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4）比较功能"><span class="nav-number">3.2.4.</span> <span class="nav-text">4）比较功能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5）PWM输出功能"><span class="nav-number">3.2.5.</span> <span class="nav-text">5）PWM输出功能</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#工作流程"><span class="nav-number">3.3.</span> <span class="nav-text">工作流程</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Little Young</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+    <span title="站点总字数">37k</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+    <span title="站点阅读时长">33 分钟</span>
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Pisces</a> v6.3.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.3.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.3.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.3.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.3.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.3.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.3.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+  
+    <script type="text/javascript">
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <!-- 小红心 -->
+  <script type="text/javascript" src="/js/src/love.js"></script>
+</body>
+</html>

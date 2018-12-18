@@ -108,18 +108,20 @@
 
 
 
-  <meta name="description" content="阿瑟东">
+  <meta name="description" content="点亮第一个LED灯以及相关拓展实验">
 <meta name="keywords" content="ZigBee">
 <meta property="og:type" content="article">
 <meta property="og:title" content="点亮第一个LED">
 <meta property="og:url" content="http://yangpengze.github.io/2018/12/18/点亮第一个LED/index.html">
 <meta property="og:site_name" content="MyBlog">
-<meta property="og:description" content="阿瑟东">
+<meta property="og:description" content="点亮第一个LED灯以及相关拓展实验">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-12-18T13:07:10.429Z">
+<meta property="og:image" content="https://i.loli.net/2018/12/18/5c18f42699a92.png">
+<meta property="og:updated_time" content="2018-12-18T13:28:21.782Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="点亮第一个LED">
-<meta name="twitter:description" content="阿瑟东">
+<meta name="twitter:description" content="点亮第一个LED灯以及相关拓展实验">
+<meta name="twitter:image" content="https://i.loli.net/2018/12/18/5c18f42699a92.png">
 
 
 
@@ -351,7 +353,7 @@
                 
               
 
-              <time title="创建时间：2018-12-18 21:03:10 / 修改时间：21:07:10" itemprop="dateCreated datePublished" datetime="2018-12-18T21:03:10+08:00">2018-12-18</time>
+              <time title="创建时间：2018-12-18 21:03:10 / 修改时间：21:28:21" itemprop="dateCreated datePublished" datetime="2018-12-18T21:03:10+08:00">2018-12-18</time>
             
 
             
@@ -373,7 +375,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/基础部分/" itemprop="url" rel="index"><span itemprop="name">基础部分</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Zigbee基础部分/" itemprop="url" rel="index"><span itemprop="name">Zigbee基础部分</span></a></span>
 
                 
                 
@@ -401,7 +403,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">4</span>
+                <span title="本文字数">1.9k</span>
               
 
               
@@ -415,7 +417,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">1 分钟</span>
+                <span title="阅读时长">2 分钟</span>
               
             </div>
           
@@ -435,7 +437,17 @@
       
 
       
-        <p>阿瑟东</p>
+        <p>点亮第一个LED灯以及相关拓展实验</p>
+<a id="more"></a>
+<p>WeBee底板的LED部分原理图 由图可知 LED1由P1_0端口控制，LED2由P1_1端口控制</p>
+<p><img src="https://i.loli.net/2018/12/18/5c18f42699a92.png" alt=""></p>
+<h3 id="1、点亮LED1"><a href="#1、点亮LED1" class="headerlink" title="1、点亮LED1"></a><strong>1、点亮LED1</strong></h3><p>源代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;ioCC2530.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span>  LED1  P1_0    <span class="comment">//定义P10口为LED1控制端</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Config_IO</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">	P1DIR |= <span class="number">0x01</span>;     <span class="comment">//P1_0定义为输出</span></span><br><span class="line"></span><br><span class="line">	P1INP |= <span class="number">0X01</span>;     <span class="comment">//打开下拉</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;   </span><br><span class="line"></span><br><span class="line">	Config_IO();      <span class="comment">//调用初始化程序</span></span><br><span class="line"></span><br><span class="line">	LED1 = <span class="number">1</span>;       <span class="comment">//点亮LED1</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span>(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>   首先，我们的这个实验目的就是要点亮第一个LED，那么我们是通过代码（软件）让硬件工作，而软件是不能直接让硬件工作的，是通过间接方式上。作为这中间桥梁的其实是寄存器，涉及到的寄存器有功能寄存器、方向寄存器和配置寄存器。应当注意的是方向寄存器，它是决定让那个灯亮的依据。代码是高级语言，无法直接控制硬件工作的，的找一个听得懂该语言的东西，这个东西就是寄存器，代码通过操作寄存器简接使硬件工作。</p>
+<p> 在以上代码中，我们可以看到P1DIR |= 0x01; 该句代码中P1DIR的功能就是在选择哪个灯亮。此处它的值是0x01，它是一个十六进制的数。转化为二进制后是八位，则功能寄存器是八位寄存器。0x01=0000 0001。再查看传感器地板，控制LED1的端口是P1_0,因此在程序的最开始要自定义#define LED1 P1_0，在main函数中要设置LED1=1，表示点亮LED1。而八位二进制的最低位是1，其余是0。 </p>
+<h3 id="2、点亮第二个LED2"><a href="#2、点亮第二个LED2" class="headerlink" title="2、点亮第二个LED2"></a>2、点亮第二个LED2</h3><p> 通过对点亮第一个LED1的代码理解后，再结合传感器底板的观察，可知控制LED2的端口是P1_1，因此如果想点亮LED2,则在以上代码中仅将自定义改成#define LED2 P1_1,void Config_IO(void)中将P1DIR的值改为0x02，main（void）中将LED1 = 1改为LED2=1，其余不变。</p>
+<h3 id="3、同时点亮LED1、LED2"><a href="#3、同时点亮LED1、LED2" class="headerlink" title="3、同时点亮LED1、LED2"></a><strong>3、同时点亮LED1、LED2</strong></h3> <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;ioCC2530.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> LED1 P1_0    <span class="comment">//定义P10口为LED1控制端</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> LED2 P1_1    <span class="comment">//定义P11口为LED2控制端</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Config_IO</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">	P1DIR |= <span class="number">0x03</span>;     <span class="comment">//P1_0 P1_1定义为输出</span></span><br><span class="line"></span><br><span class="line">	P1INP |= <span class="number">0X03</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">	LED1 = <span class="number">1</span>;       <span class="comment">//点亮LED1</span></span><br><span class="line"></span><br><span class="line">	LED2 = <span class="number">1</span>;       <span class="comment">//点亮LED2</span></span><br><span class="line"></span><br><span class="line">	Config_IO();      <span class="comment">//调用初始化程序</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span>(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="4、循环点亮LED1、LED2"><a href="#4、循环点亮LED1、LED2" class="headerlink" title="4、循环点亮LED1、LED2"></a>4、循环点亮LED1、LED2</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;ioCC2530.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> LED1 P1_0    <span class="comment">//定义P10口为LED1控制端</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> LED2 P1_1    <span class="comment">//定义P11口为LED2控制端</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Config_IO</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">	P1DIR |= <span class="number">0x03</span>;     <span class="comment">//P1_0 P1_1定义为输出</span></span><br><span class="line"></span><br><span class="line">	P1INP |= <span class="number">0X03</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Delay</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">int</span> k)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">unsigned</span> <span class="keyword">int</span> i = k; i &gt; <span class="number">0</span>; i --)</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">unsigned</span> <span class="keyword">int</span> j = <span class="number">587</span>; j &gt;<span class="number">0</span>; j --);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">	Config_IO();      <span class="comment">//调用初始化程序</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">	&#123;</span><br><span class="line"></span><br><span class="line">		LED1=<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">		Delay(<span class="number">100</span>);</span><br><span class="line"></span><br><span class="line">		LED1=<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">		LED2=<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">		Delay(<span class="number">100</span>);</span><br><span class="line"></span><br><span class="line">		LED2=<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -478,6 +490,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/18/按键实验/" rel="prev" title="按键实验">
+                按键实验 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -531,8 +547,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -551,7 +576,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-count">9</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -634,6 +659,22 @@
       </section>
 
       
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、点亮LED1"><span class="nav-number">1.</span> <span class="nav-text">1、点亮LED1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、点亮第二个LED2"><span class="nav-number">2.</span> <span class="nav-text">2、点亮第二个LED2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、同时点亮LED1、LED2"><span class="nav-number">3.</span> <span class="nav-text">3、同时点亮LED1、LED2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4、循环点亮LED1、LED2"><span class="nav-number">4.</span> <span class="nav-text">4、循环点亮LED1、LED2</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
 
       
 
@@ -659,7 +700,7 @@
       <i class="fa fa-area-chart"></i>
     </span>
     
-    <span title="站点总字数">19k</span>
+    <span title="站点总字数">37k</span>
   
 
   
@@ -668,7 +709,7 @@
       <i class="fa fa-coffee"></i>
     </span>
     
-    <span title="站点阅读时长">18 分钟</span>
+    <span title="站点阅读时长">33 分钟</span>
   
 </div>
 
